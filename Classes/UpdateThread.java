@@ -18,7 +18,7 @@ public class UpdateThread implements Runnable {
             System.out.println("OPTIONS:\t\t1.Bolus 2.Menu");
 
             try {
-                Thread.sleep(60000);
+                Thread.sleep(Pump.UPDATE_PER_HOUR * 1000);
 
             } catch (InterruptedException e) {
                 throw new RuntimeException(e);

@@ -10,7 +10,7 @@ class BolusSettings {
     private double[] targetGlucose;
     //SimpleDateFormat sdf = new SimpleDateFormat("hh a");
 
-    // ***** CONSTRUCTOR ********************
+    // ***** CONSTRUCTOR *********************************************
     protected BolusSettings() {
         setCarbRatio();
         setInsulinSensitivity();
@@ -25,7 +25,7 @@ class BolusSettings {
         setTargetGlucose(configs.get("TARGET_GLUCOSE"));
     }
 
-    // ***** GETTERS ********************
+    // ***** GETTERS *********************************************
     double getCarbRatio(int hour) {
         return carbRatio.get(hour-1);
     }
@@ -49,7 +49,7 @@ class BolusSettings {
 
         Scanner scan = new Scanner(System.in);
         for (int i = 0; i < 24; i++) {
-            System.out.println(i + ": ");
+            System.out.format("%02d:00: ", i);
             double temp = scan.nextDouble();
             carbRatio.add(temp);
         }
@@ -69,11 +69,11 @@ class BolusSettings {
 
     private void setInsulinSensitivity() {
         System.out.println("\n***INSULIN SENSITIVITY***");
-        System.out.println("Enter the insulin sensitivity:");
+        System.out.println("Enter the insulin sensitivity: ");
 
         Scanner scan = new Scanner(System.in);
         for (int i = 0; i < 24; i++) {
-            System.out.println(i + ": ");
+            System.out.format("%02d:00: ", i);
             double temp = scan.nextDouble();
             insulinSensitivity.add(temp);
         }
@@ -93,7 +93,7 @@ class BolusSettings {
 
     private void setInsulinLongevity() {
         System.out.println("\n***INSULIN LONGEVITY***");
-        System.out.println("Enter the insulin longevity:");
+        System.out.print("Enter the insulin longevity: ");
 
         Scanner scan = new Scanner(System.in);
         insulinLongevity = scan.nextInt();
@@ -114,10 +114,10 @@ class BolusSettings {
         System.out.println("\n***TARGET GLUCOSE***");
         Scanner scan = new Scanner(System.in);
 
-        System.out.println("Enter the lowest target:");
+        System.out.print("Enter the lowest target: ");
         double low = scan.nextDouble();
 
-        System.out.println("Enter the highest target:");
+        System.out.print("Enter the highest target: ");
         double high = scan.nextDouble();
 
         // if the "low" variable is actually larger than the "high" variable,

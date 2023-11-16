@@ -15,7 +15,7 @@ public class BasalThread implements Runnable {
             pump.basal();
 
             try {
-                Thread.sleep(60000);
+                Thread.sleep(Pump.BASAL_PER_HOUR * 1000);
 
             } catch (InterruptedException e) {
                 throw new RuntimeException(e);

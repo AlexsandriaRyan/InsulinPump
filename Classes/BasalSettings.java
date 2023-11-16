@@ -8,7 +8,7 @@ public class BasalSettings {
     int currentBasalPattern;
     //SimpleDateFormat sdf = new SimpleDateFormat("hh a");
 
-    // ***** CONSTRUCTOR ********************
+    // ***** CONSTRUCTOR *********************************************
     protected BasalSettings() {
         setBasalPattern();
     }
@@ -21,18 +21,18 @@ public class BasalSettings {
         }
     }
 
-    // ***** GETTERS ********************
+    // ***** GETTERS *********************************************
     double getBasalPattern(int hour) {
         return basalPatterns.get(currentBasalPattern).get(hour);
     }
 
-    // ***** SETTERS ********************
+    // ***** SETTERS *********************************************
     private void setBasalPattern() {
         // show available basal patterns (1, 2, 3... etc.)
         // view a basal pattern
         // delete a current basal pattern
         // new basal pattern
-        // needs to set current basal pattern to 0 (first pattern), and a way to change between patterns...?
+        // needs a way to change between patterns...?
 
         System.out.println("\n***NEW BASAL PATTERN***");
         System.out.println("Enter units of insulin per hour:");
@@ -41,7 +41,7 @@ public class BasalSettings {
 
         Scanner scan = new Scanner(System.in);
         for (int i = 0; i < 24; i++) {
-            System.out.println(i + ": ");
+            System.out.format("%02d:00: ", i);
             double basal = scan.nextDouble();
             temp.add(basal);
         }

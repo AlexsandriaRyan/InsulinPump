@@ -9,31 +9,27 @@ import Classes.UpdateThread;
 import java.io.*;
 import java.util.*;
 
+// TO DO / CONSIDER
+// Ensure there is insulin in the reservoir before basal / bolus.
+// If there is not enough insulin, alert user of outstanding insulin that was not delivered
+// Put Menu printlns in a different function? Within the pump class or main class?
+// In BasalSettings, make it so that the time is output when asking for new configs
+
 public class Main {
-
-    // notes:
-    // consider making a 'common' class with commonly used / static variables
-    // variables could include THE hashmap (which would be updated upon setting bolus / basal settings), a variable for hours (24), etc
-
-    // design the navigations. ie., menus, the options within those menus, etc.
-
     final static String configFilePath = "Configs/configs.txt";
     public static Pump pump;
 
     public static void main(String[] args) {
-        // create hashmaps based on config file then create
-        // pump object, either with configs or via setup process
+        // create hashmaps based on config file
         HashMap<String, ArrayList<String>> configs = init();
 
         if(!configs.isEmpty()) {
-//            for (HashMap.Entry<String, ArrayList<String>> entry : configs.entrySet()) {
-//                System.out.println(entry.getKey() + "\n" + entry.getValue() + "\n");
-//            }
-
+            // create pump with configs
             pump = new Pump(configs);
             //pump.printConfigs();
 
         } else {
+            // create pump with new configs
             pump = new Pump();
         }
 
@@ -46,49 +42,53 @@ public class Main {
         Thread thread2 = new Thread(updateThread);
         thread2.start();
 
-         while (pump.active) {
-            // check for input (bolus or menu)
-            char input = '0';
-            while (input == '0') {
-                Scanner scan = new Scanner(System.in);
-                input = scan.next().charAt(1);
-                if (input == '1' || input == '2') {
-                    // if any valid input, cancel the timer, and continue through the selected menu
-                    //timer.cancel();
-    
-                    if (input == '1') {
-                        pump.bolus();
-    
-                    } else if (input == '2') {
-                        System.out.println("MAIN MENU:");
-                        System.out.println("1. Suspend Delivery");
-                        System.out.println("2. New Reservoir");
-                        System.out.println("3. Insulin Settings");
-                        System.out.println("4. Change Date / Time");
-                        System.out.println("Q to exit");
+        // check for input (bolus or menu)
+        char input = '0';
+        while (input == '0') {
+            Scanner scan = new Scanner(System.in);
+            input = scan.next().charAt(1);
+            if (input == '1' || input == '2') {
+                thread2.interrupt();
 
-                        // reset input
-                        input = '0';
+                if (input == '1') {
+                    pump.bolus();
 
-                        input = scan.next().charAt(1);
-                        switch (input) {
-                            case 1:
-                                pump.setActive();
-                            case 2:
-                                pump.newReservoir();
-                            case 3:
-                                System.out.println("INSULIN SETTINGS MENU");
-                            case 4:
-                            case 'Q' | 'q':
-                                System.out.println("Exiting Menu...");
-                            default:
-                                System.out.println("Invalid entry. Exiting Menu...");
-                        }
+                } else if (input == '2') {
+                    // stop the "update" thread to prevent it appearing over the user input
+                    thread2.interrupt();
+
+                    // TO DO HERE:
+                    // Implement the menu system
+                    // Implement a timeout feature (bookmarked on chrome)
+                    System.out.println("MAIN MENU:");
+                    System.out.println("1. Suspend Delivery");
+                    System.out.println("2. New Reservoir");
+                    System.out.println("3. Insulin Settings");
+                    System.out.println("4. Change Date / Time");
+                    System.out.println("Q to exit");
+
+                    input = scan.next().charAt(1);
+                    switch (input) {
+                        case 1:
+                            pump.setActive();
+                        case 2:
+                            pump.newReservoir();
+                        case 3:
+                            System.out.println("INSULIN SETTINGS MENU");
+                        case 4:
+                        case 'Q' | 'q':
+                            System.out.println("Exiting Menu...");
+                        default:
+                            System.out.println("Invalid entry. Exiting Menu...");
                     }
                 }
             }
-         }
-    }
+
+            // once navigation is complete, restart the "update" thread
+            thread2.start();
+        }
+     }
+
 
     // Followed this guide on reading files & storing to Hash Maps:
     // https://www.geeksforgeeks.org/reading-text-file-into-java-hashmap/
@@ -148,22 +148,3 @@ public class Main {
         return tempMap;
     }
 }
-
-
-// Initially had a timer task, opted for multi threading. unsure which is more efficient.
-//class RunPump extends TimerTask {
-//    @Override
-//    public void run() {
-//        Main.pump.basal();
-//        System.out.println(Main.pump.getTime().toString());
-//        System.out.println("ACTIVE INSULIN:\t" + Main.pump.getActiveInsulin());
-//        System.out.println("OPTIONS:\t\t1.Bolus 2.Menu");
-//    }
-//}
-
-//this part would go under while(pump.active) {
-// create the task & schedule it
-//RunPump runPump = new RunPump();
-//Timer timer = new Timer();
-//timer.schedule(runPump, 0, 60000);
-

@@ -4,8 +4,8 @@ import java.util.*;
 import java.text.SimpleDateFormat;
 
 public class Pump {
-    private BolusSettings bolusSettings;
-    private BasalSettings basalSettings;
+    private static BolusSettings bolusSettings;
+    private static BasalSettings basalSettings;
     private Date time;
     public boolean active;
     private boolean warning10;
@@ -13,10 +13,11 @@ public class Pump {
     private double reservoir;
     private ArrayList<Double> activeInsulin;
     static final int BASAL_PER_HOUR = 60;
+    static final int UPDATE_PER_HOUR = 60;
     static final int ACTIVE_INSULIN_PER_HOUR = 12;
     private SimpleDateFormat sdf = new SimpleDateFormat("E, dd MMMM, yyyy hh:mm a");
 
-    // ***** CONSTRUCTOR ********************
+    // ***** CONSTRUCTOR *********************************************
     public Pump() {
         System.out.println("***NEW INSULIN PUMP***");
         setTime();
@@ -26,8 +27,8 @@ public class Pump {
         this.warning10 = false;
         this.warning20 = false;
         this.activeInsulin = new ArrayList<>();
-        this.bolusSettings = new BolusSettings();
-        this.basalSettings = new BasalSettings();
+        bolusSettings = new BolusSettings();
+        basalSettings = new BasalSettings();
     }
 
     public Pump(HashMap<String, ArrayList<String>> configs) {
@@ -35,15 +36,15 @@ public class Pump {
         setTime();
         newReservoir();
         System.out.println(time);
-        this.bolusSettings = new BolusSettings(configs);
-        this.basalSettings = new BasalSettings(configs);
+        bolusSettings = new BolusSettings(configs);
+        basalSettings = new BasalSettings(configs);
         this.active = true;
         this.warning10 = false;
         this.warning20 = false;
         this.activeInsulin = new ArrayList<>();
     }
 
-    // ***** GETTERS ********************
+    // ***** GETTERS *********************************************
     public String getTime() {
         // look at using "clock" instead of date or time?
         setTime();
@@ -70,7 +71,7 @@ public class Pump {
         return sum;
     }
 
-    // ***** SETTERS ********************
+    // ***** SETTERS *********************************************
     private void setTime() {
         time = new Date();
     }
@@ -105,13 +106,7 @@ public class Pump {
         }
     }
 
-    private void reduceActiveInsulin() {
-        if (!activeInsulin.isEmpty()) {
-            activeInsulin.remove(0);
-        }
-    }
-
-    // ***** FUNCTIONS ********************
+    // ***** FUNCTIONS *********************************************
     private void saveConfigs() {
         // create a function that will save configs based on the pump's
         // bolus / basal settings. This should be run every time that
@@ -128,20 +123,13 @@ public class Pump {
         System.out.println("CURRENT BASAL PATTERN: " + basalSettings.getBasalPattern(getHour()));
     }
 
-    private void timer() {
-        // make a function that runs every x minutes.
-        // this should...
-        // * administer basal insulin
-        // * reduce active insulin
-    }
-
     public void bolus() {
         System.out.println("BOLUS FUNCTION");
+
+        // temp hardcoded bolus
         double bolus = 10;
 
         // make a function that administers a bolus
-        // bolusing will push the piston up, and remeasure the reservoir amount
-        // update active insulin
         setReservoir(bolus);
         setActiveInsulin(bolus);
     }
@@ -149,6 +137,12 @@ public class Pump {
     public void basal() {
         // reduce reservoir based on amount specified by the current basal settings
         setReservoir(basalSettings.getBasalPattern(getHour()) / BASAL_PER_HOUR);
+    }
+
+    private void reduceActiveInsulin() {
+        if (!activeInsulin.isEmpty()) {
+            activeInsulin.remove(0);
+        }
     }
 
     public void newReservoir() {
