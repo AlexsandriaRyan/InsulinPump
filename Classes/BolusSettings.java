@@ -49,7 +49,7 @@ class BolusSettings {
 
         Scanner scan = new Scanner(System.in);
         for (int i = 0; i < 24; i++) {
-            System.out.format("%02d:00: ", i);
+            System.out.printf("%02d:00: ", i);
             double temp = scan.nextDouble();
             carbRatio.add(temp);
         }
@@ -73,7 +73,7 @@ class BolusSettings {
 
         Scanner scan = new Scanner(System.in);
         for (int i = 0; i < 24; i++) {
-            System.out.format("%02d:00: ", i);
+            System.out.printf("%02d:00: ", i);
             double temp = scan.nextDouble();
             insulinSensitivity.add(temp);
         }

@@ -12,6 +12,7 @@ public class Pump {
     private boolean warning20;
     private double reservoir;
     private ArrayList<Double> activeInsulin;
+    // make diff variables
     static final int BASAL_PER_HOUR = 60;
     static final int UPDATE_PER_HOUR = 60;
     static final int ACTIVE_INSULIN_PER_HOUR = 12;
@@ -35,7 +36,6 @@ public class Pump {
         System.out.println("***WELCOME BACK***");
         setTime();
         newReservoir();
-        System.out.println(time);
         bolusSettings = new BolusSettings(configs);
         basalSettings = new BasalSettings(configs);
         this.active = true;
@@ -82,11 +82,11 @@ public class Pump {
         reservoir = reservoir - insulinUsed;
 
         if (reservoir <= 10 && !warning10) {
-            System.out.println("WARNING: Reservoir has 10 units of remaining. Please change reservoir soon.");
+            System.out.println("WARNING: Reservoir has 10 units of insulin remaining. Please change reservoir soon.");
             warning10 = true;
 
         } else if (reservoir <= 20 && !warning20) {
-            System.out.println("WARNING: Reservoir has 20 units of remaining. Please change reservoir soon.");
+            System.out.println("WARNING: Reservoir has 20 units of insulin remaining. Please change reservoir soon.");
             warning20 = true;
         }
     }
@@ -124,14 +124,33 @@ public class Pump {
     }
 
     public void bolus() {
-        System.out.println("BOLUS FUNCTION");
+        System.out.println("***BOLUS***");
 
-        // temp hardcoded bolus
-        double bolus = 10;
+        Scanner scan = new Scanner(System.in);
 
-        // make a function that administers a bolus
-        setReservoir(bolus);
-        setActiveInsulin(bolus);
+        System.out.print("BG: ");
+        double bg = scan.nextDouble();
+
+        System.out.print("Carbs: ");
+        double carbs = scan.nextDouble();
+
+        System.out.print("Manual Bolus: ");
+        double manual = scan.nextDouble();
+
+        double bolus = bg + carbs + manual;
+
+        System.out.printf("Total: %.2f", bolus);
+        System.out.println("OK?");
+        System.out.println("1. Yes");
+        System.out.println("2. No");
+
+        int input = scan.nextInt();
+
+        if (input == 1) {
+            setReservoir(bolus);
+            setActiveInsulin(bolus);
+            System.out.printf("%.2f delivered.", bolus);
+        }
     }
 
     public void basal() {
@@ -149,7 +168,7 @@ public class Pump {
         System.out.println("NEW RESERVOIR FUNCTION");
 
         // hardcoded to be a full reservoir (3mL / 300 units)
-        reservoir = 300;
+        reservoir = 20;
 
         // make a function that retracts the piston and allows a new vial to be inserted
         // when a new vial is put in, push the piston up to meet where the new vial is filled to

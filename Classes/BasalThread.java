@@ -2,7 +2,6 @@ package Classes;
 
 public class BasalThread implements Runnable {
 
-    // is it more convenient to use a public static Pump in main, or pass it through as a parameter?
     private final Pump pump;
     public BasalThread (Pump pump) {
         this.pump = pump;

@@ -11,10 +11,12 @@ public class UpdateThread implements Runnable {
     @Override
     public void run() {
         // while the pump is active, print time, active insulin amount, and repeat every 1 minute
+        // add second variabke for if this can or cannot be displayed
         while (pump.active) {
             System.out.println("------------------------------");
             System.out.println(pump.getTime());
             System.out.println("ACTIVE INSULIN:\t" + pump.getActiveInsulin());
+            System.out.printf("RESERVOIR:\t\t%.3f\n", pump.getReservoir());
             System.out.println("OPTIONS:\t\t1.Bolus 2.Menu");
 
             try {

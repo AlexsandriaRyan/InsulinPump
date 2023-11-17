@@ -41,7 +41,7 @@ public class BasalSettings {
 
         Scanner scan = new Scanner(System.in);
         for (int i = 0; i < 24; i++) {
-            System.out.format("%02d:00: ", i);
+            System.out.printf("%02d:00: ", i);
             double basal = scan.nextDouble();
             temp.add(basal);
         }
@@ -63,7 +63,6 @@ public class BasalSettings {
         basalPatterns.add(temp);
 
         // check if this pattern should be the current basal pattern
-        System.out.println(pattern);
         if (pattern.endsWith("*")) {
             currentBasalPattern = basalPatterns.size()-1;
         }
