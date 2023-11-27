@@ -4,7 +4,7 @@ import java.util.*;
 import java.text.SimpleDateFormat;
 
 public class Pump {
-    protected static BolusSettings bolusSettings;
+    static BolusSettings bolusSettings;
     protected static BasalSettings basalSettings;
     private static Menu menus = null;
     private Date time;
@@ -18,6 +18,7 @@ public class Pump {
     private static final int BASAL_PER_HOUR = 60;
     private static final int ACTIVE_INSULIN_PER_HOUR = 60;
     private final SimpleDateFormat sdf = new SimpleDateFormat("E, dd MMMM, yyyy hh:mm a");
+    private final String warning0String = "WARNING: Reservoir has 0 units of insulin remaining. Please change the reservoir immediately.";
 
     // ***** CONSTRUCTOR *********************************************
     public Pump() {
@@ -103,7 +104,6 @@ public class Pump {
 
     public void setReservoir(double insulinUsed, String command) {
         // set warning strings to avoid repetition
-        String warning0String = "WARNING: Reservoir has 0 units of insulin remaining. Please change the reservoir immediately.";
         String warning10String = "WARNING: Reservoir has < 10 units of insulin remaining. Please change reservoir soon.";
         String warning20String = "WARNING: Reservoir has < 20 units of insulin remaining. Please change reservoir soon.";
 
@@ -141,7 +141,7 @@ public class Pump {
             reservoir = tempReservoir;
 
             // print out confirmation of delivery if the setReservoir() request came from a bolus
-            if (command == "bolus") {
+            if (command.equals("bolus")) {
                 System.out.printf("%.2f delivered.\n", insulinUsed);
             }
 
@@ -183,7 +183,7 @@ public class Pump {
     public void bolus() {
         // if the reservoir has no insulin left, do not bolus
         if (reservoir <= 0) {
-            System.out.println("WARNING: Reservoir has 0 units of insulin remaining. Please change the reservoir immediately.");
+            System.out.println(warning0String);
 
             return;
         }

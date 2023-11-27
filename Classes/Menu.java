@@ -1,12 +1,10 @@
 package Classes;
 
-import java.util.ArrayList;
 import java.util.Scanner;
 
 public class Menu {
 
     private final Pump pump;
-
     public Menu(Pump pump) { this.pump = pump; }
     protected void mainMenu() {
         System.out.println("MAIN MENU:");
@@ -39,8 +37,6 @@ public class Menu {
                 System.out.println("Invalid entry. Exiting Menu...");
                 break;
         }
-
-        return;
     }
 
     protected void insulinMenu() {
