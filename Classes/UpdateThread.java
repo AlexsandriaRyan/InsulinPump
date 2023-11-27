@@ -9,7 +9,7 @@ public class UpdateThread implements Runnable {
 
     @Override
     public void run() {
-        // while the pump is active, print time, active insulin amount, and repeat every 1 minute
+        // while the pump permits updates, print time, active insulin amount, and repeat every 1 minute
         while (Pump.update) {
             System.out.println("------------------------------");
             System.out.println(pump.getTime());

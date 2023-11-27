@@ -2,7 +2,7 @@ package Classes;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
-class BolusSettings {
+public class BolusSettings {
     private final ArrayList<Double> carbRatio = new ArrayList<>();
     private final ArrayList<Double> insulinSensitivity = new ArrayList<>();
     private int insulinLongevity;
@@ -10,7 +10,7 @@ class BolusSettings {
     //SimpleDateFormat sdf = new SimpleDateFormat("hh a");
 
     // ***** CONSTRUCTOR *********************************************
-    protected BolusSettings() {
+    BolusSettings() {
         setCarbRatio();
         setInsulinSensitivity();
         setInsulinLongevity();
@@ -25,27 +25,35 @@ class BolusSettings {
     }
 
     // ***** GETTERS *********************************************
-    double getCarbRatio(int hour) {
+    public double getCarbRatio(int hour) {
         return carbRatio.get(hour);
     }
 
-    double getInsulinSensitivity(int hour) {
+    public ArrayList<Double> getCarbRatio() {
+        return carbRatio;
+    }
+
+    public double getInsulinSensitivity(int hour) {
         return insulinSensitivity.get(hour);
     }
 
-    int getInsulinLongevity() {
+    public ArrayList<Double> getInsulinSensitivity() {
+        return carbRatio;
+    }
+
+    public int getInsulinLongevity() {
         return insulinLongevity;
     }
 
-    double[] getTargetGlucose() {
+    public double[] getTargetGlucose() {
         return targetGlucose;
     }
 
-    double getLowTarget() { return targetGlucose[0]; }
+    public double getLowTarget() { return targetGlucose[0]; }
 
-    double getHighTarget() { return targetGlucose[1]; }
+    public double getHighTarget() { return targetGlucose[1]; }
 
-    // ***** SETTERS ********************
+    // ***** SETTERS *********************************************
     protected void setCarbRatio() {
         System.out.println("\n***CARB RATIO***");
         System.out.println("Enter the grams of carbs per unit of insulin:");

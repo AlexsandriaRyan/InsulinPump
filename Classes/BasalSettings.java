@@ -26,6 +26,18 @@ public class BasalSettings {
         return basalPatterns.get(currentBasalPattern).get(hour);
     }
 
+    public int getBasalPatternsSize() {
+        return basalPatterns.size();
+    }
+
+    public ArrayList<Double> getBasalPatternIndex(int index) {
+        return basalPatterns.get(index);
+    }
+
+    public int getCurrentBasalPattern() {
+        return currentBasalPattern;
+    }
+
     // ***** SETTERS *********************************************
     private void setBasalPattern() {
         // show available basal patterns (1, 2, 3... etc.)

@@ -70,6 +70,8 @@ public class Pump {
         return basalSettings;
     }
 
+    public BolusSettings getBolusSettings() { return bolusSettings; }
+
     // ***** SETTERS *********************************************
     private void setTime() {
         time = new Date();
