@@ -48,6 +48,8 @@ public class BasalSettings {
         
         basalPatterns.add(temp);
 
+        System.out.print("Basal Pattern saved!");
+
         // write to configs
     }
 

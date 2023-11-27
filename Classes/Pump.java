@@ -4,19 +4,20 @@ import java.util.*;
 import java.text.SimpleDateFormat;
 
 public class Pump {
-    private static BolusSettings bolusSettings;
-    private static BasalSettings basalSettings;
+    protected static BolusSettings bolusSettings;
+    protected static BasalSettings basalSettings;
+    private static Menu menus = null;
     private Date time;
-    public boolean active;
-    private boolean warning10;
-    private boolean warning20;
+    public static boolean active = true;
+    public static boolean update = true;
+    private boolean warning10 = false;
+    private boolean warning20 = false;
+    private boolean warning0 = false;
     private double reservoir;
-    private ArrayList<Double> activeInsulin;
-    // make diff variables
-    static final int BASAL_PER_HOUR = 60;
-    static final int UPDATE_PER_HOUR = 60;
-    static final int ACTIVE_INSULIN_PER_HOUR = 12;
-    private SimpleDateFormat sdf = new SimpleDateFormat("E, dd MMMM, yyyy hh:mm a");
+    private ArrayList<Double> activeInsulin = new ArrayList<>();
+    private static final int BASAL_PER_HOUR = 60;
+    private static final int ACTIVE_INSULIN_PER_HOUR = 60;
+    private final SimpleDateFormat sdf = new SimpleDateFormat("E, dd MMMM, yyyy hh:mm a");
 
     // ***** CONSTRUCTOR *********************************************
     public Pump() {
@@ -24,12 +25,9 @@ public class Pump {
         setTime();
         newReservoir();
         System.out.println(sdf.format(time));
-        this.active = true;
-        this.warning10 = false;
-        this.warning20 = false;
-        this.activeInsulin = new ArrayList<>();
         bolusSettings = new BolusSettings();
         basalSettings = new BasalSettings();
+        menus = new Menu(this);
     }
 
     public Pump(HashMap<String, ArrayList<String>> configs) {
@@ -38,22 +36,18 @@ public class Pump {
         newReservoir();
         bolusSettings = new BolusSettings(configs);
         basalSettings = new BasalSettings(configs);
-        this.active = true;
-        this.warning10 = false;
-        this.warning20 = false;
-        this.activeInsulin = new ArrayList<>();
+        menus = new Menu(this);
     }
 
     // ***** GETTERS *********************************************
     public String getTime() {
-        // look at using "clock" instead of date or time?
         setTime();
         return sdf.format(time);
     }
 
     public int getHour() {
         // gets & returns a 24h format of the current time's hour
-        String hourStr = new SimpleDateFormat("kk").format(time);
+        String hourStr = new SimpleDateFormat("HH").format(time);
         return Integer.parseInt(hourStr);
     }
 
@@ -71,23 +65,86 @@ public class Pump {
         return sum;
     }
 
+    public BasalSettings getBasalSettings() {
+        return basalSettings;
+    }
+
     // ***** SETTERS *********************************************
     private void setTime() {
         time = new Date();
     }
 
-    public void setActive() { active = active ? false : true; }
+    public void setActive() {
+        Scanner scan = new Scanner(System.in);
 
-    public void setReservoir(double insulinUsed) {
-        reservoir = reservoir - insulinUsed;
+        if (active) {
+            System.out.println("Suspend pump activity?");
+            System.out.println("1. Yes");
+            System.out.println("2. No");
 
-        if (reservoir <= 10 && !warning10) {
-            System.out.println("WARNING: Reservoir has 10 units of insulin remaining. Please change reservoir soon.");
+            char input = scan.next().charAt(0);
+            if (input == '1') {
+                active = false;
+                System.out.println("Pump activity has been suspended.");
+            }
+
+        } else {
+            System.out.println("Resume pump activity?");
+            System.out.println("1. Yes");
+            System.out.println("2. No");
+
+            char input = scan.next().charAt(0);
+            if (input == '1') {
+                active = true;
+                System.out.println("Pump activity has resumed.");
+            }
+        }
+    }
+
+    public void setReservoir(double insulinUsed, String command) {
+        // set warning strings to avoid repetition
+        String warning0String = "WARNING: Reservoir has 0 units of insulin remaining. Please change the reservoir immediately.";
+        String warning10String = "WARNING: Reservoir has < 10 units of insulin remaining. Please change reservoir soon.";
+        String warning20String = "WARNING: Reservoir has < 20 units of insulin remaining. Please change reservoir soon.";
+
+        // if reservoir has reached 0, simply return
+        if (reservoir <= 0 && !warning0) {
+            System.out.println(warning0String);
+            warning0 = true;
+            reservoir = 0; // ensure reservoir is simply '0'
+
+            return;
+
+        // if the reservoir is 10 units or under, display a warning.
+        } else if (reservoir <= 10 && !warning10) {
+            System.out.println(warning10String);
             warning10 = true;
 
+        // if the reservoir is 20 units or under, display a warning.
         } else if (reservoir <= 20 && !warning20) {
-            System.out.println("WARNING: Reservoir has 20 units of insulin remaining. Please change reservoir soon.");
+            System.out.println(warning20String);
             warning20 = true;
+        }
+
+        // test to see if there is enough insulin in reservoir to complete action.
+        double tempReservoir = reservoir - insulinUsed;
+
+        // if tempReservoir reaches 0 units, display warning
+        if (tempReservoir <= 0) {
+            System.out.printf("WARNING: Could not complete requested bolus amount. Bolus delivered: %.2f of %.2f units\n", reservoir, insulinUsed);
+            System.out.println(warning0String);
+            warning0 = true;
+            reservoir = 0; // ensure reservoir is simply '0'
+
+        // if tempReservoir still has units remaining, update the reservoir amount
+        } else {
+            reservoir = tempReservoir;
+
+            // print out confirmation of delivery if the setReservoir() request came from a bolus
+            if (command == "bolus") {
+                System.out.printf("%.2f delivered.\n", insulinUsed);
+            }
+
         }
     }
 
@@ -124,38 +181,48 @@ public class Pump {
     }
 
     public void bolus() {
-        System.out.println("***BOLUS***");
+        // if the reservoir has no insulin left, do not bolus
+        if (reservoir <= 0) {
+            System.out.println("WARNING: Reservoir has 0 units of insulin remaining. Please change the reservoir immediately.");
 
+            return;
+        }
+
+        System.out.println("***BOLUS***");
         Scanner scan = new Scanner(System.in);
 
+        // capture blood glucose & calculate corrective insulin
         System.out.print("BG: ");
         double bg = scan.nextDouble();
+        double correction = correct(bg);
 
+        // capture carbohydrates
         System.out.print("Carbs: ");
         double carbs = scan.nextDouble();
 
+        // capture manual bolus
         System.out.print("Manual Bolus: ");
         double manual = scan.nextDouble();
 
-        double bolus = bg + carbs + manual;
+        // add correction, carbs, and manual bolus to calculate total bolus amount
+        double bolus = correction + carbs + manual;
 
-        System.out.printf("Total: %.2f", bolus);
+        System.out.printf("Total: %.2f units\n", bolus);
         System.out.println("OK?");
         System.out.println("1. Yes");
         System.out.println("2. No");
 
-        int input = scan.nextInt();
-
-        if (input == 1) {
-            setReservoir(bolus);
+        // if user accepts bolus, set the reservoir to the new amount, calculate active insulin, and print confirmation of bolus
+        char input = scan.next().charAt(0);
+        if (input == '1') {
+            setReservoir(bolus, "bolus");
             setActiveInsulin(bolus);
-            System.out.printf("%.2f delivered.", bolus);
         }
     }
 
     public void basal() {
         // reduce reservoir based on amount specified by the current basal settings
-        setReservoir(basalSettings.getBasalPattern(getHour()) / BASAL_PER_HOUR);
+        setReservoir(basalSettings.getBasalPattern(getHour()) / BASAL_PER_HOUR, "basal");
     }
 
     private void reduceActiveInsulin() {
@@ -165,16 +232,82 @@ public class Pump {
     }
 
     public void newReservoir() {
-        System.out.println("NEW RESERVOIR FUNCTION");
+        System.out.println("How much insulin is in the new reservoir?");
 
-        // hardcoded to be a full reservoir (3mL / 300 units)
-        reservoir = 20;
+        Scanner scan = new Scanner(System.in);
+        reservoir = scan.nextInt();
 
-        // make a function that retracts the piston and allows a new vial to be inserted
-        // when a new vial is put in, push the piston up to meet where the new vial is filled to
-        // measure the reservoir amount
-        // prime the tubing
-        // prime the cannula
-        // restart the timer
+        // since there are no mechanics available to measure properly,
+        // force the insulin amount to be between 20-300 units
+        if (reservoir > 300) {
+            reservoir = 300;
+
+        } else if (reservoir < 20) {
+            reservoir = 20;
+        }
+
+        System.out.println("Beep, boop, pretend I am retracting my piston...");
+        System.out.println("Beep, boop, pretend I am measuring the new reservoir...");
+        System.out.println("Beep, boop, new reservoir amount is " + reservoir + "...");
+        System.out.println("Beep, boop, pretend I am priming the tubing, which uses 10 units...");
+
+        // calculates insulin needed to prime tubing; this differs by product,
+        // but is typically 10 units for me, personally
+        reservoir -= 10;
+
+        System.out.println("Beep, boop, pretend I am priming a 6mm cannula...");
+
+        // calculates insulin needed for a 6mm cannula; 0.5 units per mm
+        double cannula = 6 * 0.5;
+        reservoir -= cannula;
+
+        System.out.println("Beep, boop, new reservoir locked & loaded!");
+    }
+
+    private double correct(double bg) {
+        // calculate insulin needed to meet glucose targets
+        if (bg < bolusSettings.getLowTarget()) {
+            // calculate less insulin
+            return -1; // TEMP
+
+        } else if (bg > bolusSettings.getHighTarget()) {
+            // calculate more insulin
+            return 1; // TEMP
+
+        } else {
+            // no adjustment needed
+            return 0;
+        }
+    }
+
+    public void checkForMenu() {
+        // check for input (bolus or menu)
+        char input = '0';
+        while (input == '0') {
+            Scanner scan = new Scanner(System.in);
+            input = scan.next().charAt(0);
+
+            if (input == '1' || input == '2') {
+                // stop the "update" thread to prevent it appearing over the user input
+                Pump.update = false;
+
+                if (input == '1') {
+                    // if the pump is not suspended, allow bolus.
+                    if(active) {
+                        bolus();
+
+                    } else {
+                        System.out.println("Pump is suspended. Please resume pump activity to enable bolus functions.");
+                    }
+
+                } else {
+                    // TO DO HERE:
+                    // Implement a timeout feature (bookmarked on chrome)
+                    menus.mainMenu();
+                }
+            }
+            // once navigation is complete, resume the updates
+            update = true;
+        }
     }
 }

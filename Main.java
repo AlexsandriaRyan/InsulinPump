@@ -9,11 +9,13 @@ import Classes.UpdateThread;
 import java.io.*;
 import java.util.*;
 
-// TO DO / CONSIDER
-// Ensure there is insulin in the reservoir before basal / bolus.
-// If there is not enough insulin, alert user of outstanding insulin that was not delivered
-// Put Menu printlns in a different function? Within the pump class or main class?
+// TO DO / CONSIDER / Notes
 // write configs to file
+// implement timeout feature for capturing chars
+// work on correct() function
+// work on reduceActiveInsulin() function
+// work on basalMenu() function
+// work on using a foreach loop over basal patterns
 
 public class Main {
     final static String configFilePath = "Configs/configs.txt";
@@ -33,55 +35,15 @@ public class Main {
             pump = new Pump();
         }
 
-        // should I be putting the threads in main? I'm assuming so?
+        // begin basal tasks
         BasalThread basalThread = new BasalThread(pump);
         Thread thread1 = new Thread(basalThread);
         thread1.start();
 
+        // begin update tasks
         UpdateThread updateThread = new UpdateThread(pump);
         Thread thread2 = new Thread(updateThread);
         thread2.start();
-
-        // check for input (bolus or menu)
-        char input = '0';
-        while (input == '0') {
-            Scanner scan = new Scanner(System.in);
-            input = scan.next().charAt(0);
-            if (input == '1' || input == '2') {
-                thread2.interrupt();
-
-                if (input == '1') {
-                    pump.bolus();
-
-                } else if (input == '2') {
-                    // stop the "update" thread to prevent it appearing over the user input
-                    thread2.interrupt();
-
-                    // TO DO HERE:
-                    // Implement the menu system
-                    // Implement a timeout feature (bookmarked on chrome)
-                    mainMenu();
-
-                    input = scan.next().charAt(0);
-                    switch (input) {
-                        case 1:
-                            pump.setActive();
-                        case 2:
-                            pump.newReservoir();
-                        case 3:
-                            insulinMenu();
-                        case 4:
-                        case 'Q' | 'q':
-                            System.out.println("Exiting Menu...");
-                        default:
-                            System.out.println("Invalid entry. Exiting Menu...");
-                    }
-                }
-            }
-
-            // once navigation is complete, restart the "update" thread
-            thread2.start();
-        }
      }
 
 
@@ -141,37 +103,5 @@ public class Main {
         }
 
         return tempMap;
-    }
-
-    // put all UI in a diff class
-    private static void mainMenu() {
-        System.out.println("MAIN MENU:");
-        System.out.println("1. Suspend Delivery");
-        System.out.println("2. New Reservoir");
-        System.out.println("3. Insulin Settings");
-        System.out.println("4. Change Date / Time");
-        System.out.println("Q to exit");
-    }
-
-    private static void insulinMenu() {
-        System.out.println("INSULIN MENU:");
-        System.out.println("1. Bolus Settings");
-        System.out.println("2. Basal Settings");
-        System.out.println("Q to exit");
-    }
-
-    private static void bolusMenu() {
-        System.out.println("BOLUS MENU:");
-        System.out.println("1. Carb Ratio");
-        System.out.println("2. Insulin Sensitivity");
-        System.out.println("3. Insulin Longevity");
-        System.out.println("4. Target Glucose");
-        System.out.println("Q to exit");
-    }
-
-    private static void basalMenu() {
-        System.out.println("BASAL MENU:");
-        // for each loop of basal patterns
-        System.out.println("Q to exit");
     }
 }

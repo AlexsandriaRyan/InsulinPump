@@ -1,5 +1,4 @@
 package Classes;
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
@@ -27,7 +26,7 @@ class BolusSettings {
 
     // ***** GETTERS *********************************************
     double getCarbRatio(int hour) {
-        return carbRatio.get(hour-1);
+        return carbRatio.get(hour);
     }
 
     double getInsulinSensitivity(int hour) {
@@ -42,8 +41,12 @@ class BolusSettings {
         return targetGlucose;
     }
 
+    double getLowTarget() { return targetGlucose[0]; }
+
+    double getHighTarget() { return targetGlucose[1]; }
+
     // ***** SETTERS ********************
-    private void setCarbRatio() {
+    protected void setCarbRatio() {
         System.out.println("\n***CARB RATIO***");
         System.out.println("Enter the grams of carbs per unit of insulin:");
 
@@ -53,6 +56,8 @@ class BolusSettings {
             double temp = scan.nextDouble();
             carbRatio.add(temp);
         }
+
+        System.out.print("Carb Ratio saved!");
 
         // write to configs
     }
@@ -67,7 +72,7 @@ class BolusSettings {
         // write to configs
     }
 
-    private void setInsulinSensitivity() {
+    protected void setInsulinSensitivity() {
         System.out.println("\n***INSULIN SENSITIVITY***");
         System.out.println("Enter the insulin sensitivity: ");
 
@@ -77,6 +82,8 @@ class BolusSettings {
             double temp = scan.nextDouble();
             insulinSensitivity.add(temp);
         }
+
+        System.out.print("Insulin Sensitivity saved!");
 
         // write to configs
     }
@@ -91,12 +98,14 @@ class BolusSettings {
         // write to configs
     }
 
-    private void setInsulinLongevity() {
+    protected void setInsulinLongevity() {
         System.out.println("\n***INSULIN LONGEVITY***");
         System.out.print("Enter the insulin longevity: ");
 
         Scanner scan = new Scanner(System.in);
         insulinLongevity = scan.nextInt();
+
+        System.out.print("Insulin Longevity saved!");
 
         // write to configs
     }
@@ -110,7 +119,7 @@ class BolusSettings {
         // write to configs
     }
 
-    private void setTargetGlucose() {
+    protected void setTargetGlucose() {
         System.out.println("\n***TARGET GLUCOSE***");
         Scanner scan = new Scanner(System.in);
 
@@ -129,6 +138,8 @@ class BolusSettings {
         }
 
         targetGlucose = new double[]{low, high};
+
+        System.out.print("Target Glucose saved!");
 
         // write to configs
     }
@@ -153,7 +164,7 @@ class BolusSettings {
             low = temp;
         }
 
-        targetGlucose = new double[]{low, high};
+        targetGlucose = new double[]{ low, high };
 
         // write to configs
     }

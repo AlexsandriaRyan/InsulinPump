@@ -6,15 +6,16 @@ public class BasalThread implements Runnable {
     public BasalThread (Pump pump) {
         this.pump = pump;
     }
+    private static final int ONE_MINUTE = 60000;
 
     @Override
     public void run() {
         // while the pump is active, run the basal() function and repeat every 1 minute
-        while (pump.active) {
+        while (Pump.active && pump.getReservoir() > 0) {
             pump.basal();
 
             try {
-                Thread.sleep(Pump.BASAL_PER_HOUR * 1000);
+                Thread.sleep(ONE_MINUTE);
 
             } catch (InterruptedException e) {
                 throw new RuntimeException(e);
