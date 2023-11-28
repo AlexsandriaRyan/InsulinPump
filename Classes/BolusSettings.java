@@ -38,7 +38,7 @@ public class BolusSettings {
     }
 
     public ArrayList<Double> getInsulinSensitivity() {
-        return carbRatio;
+        return insulinSensitivity;
     }
 
     public int getInsulinLongevity() {

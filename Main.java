@@ -10,7 +10,6 @@ import java.io.*;
 import java.util.*;
 
 // TO DO / CONSIDER / Notes
-// fix write configs: insulin sensitivity seems to be the same as carb ratio...?
 // implement timeout feature for capturing chars
 // work on correct() function
 // work on reduceActiveInsulin() function
