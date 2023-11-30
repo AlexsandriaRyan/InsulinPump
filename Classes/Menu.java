@@ -125,7 +125,7 @@ public class Menu {
                 break;
 
             case '3':
-                Pump.bolusSettings.setInsulinLongevity();
+                Pump.basalSettings.setCurrentBasalPattern();
                 break;
 
             case 'Q' | 'q':
@@ -136,7 +136,5 @@ public class Menu {
                 System.out.println("Invalid entry. Exiting Menu...");
                 break;
         }
-        // for each loop of basal patterns
-        System.out.println("Q to exit");
     }
 }

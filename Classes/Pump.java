@@ -369,7 +369,7 @@ public class Pump {
                     bw.write("BASAL_PATTERN " + (i+1));
 
                     // if this pattern is the current pattern, add an '*'
-                    if (i+1 == current) {
+                    if (i == current) {
                         bw.write(" *\n");
 
                     } else {

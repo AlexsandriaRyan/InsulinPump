@@ -13,8 +13,6 @@ import java.util.*;
 // implement timeout feature for capturing chars
 // work on correct() function
 // work on reduceActiveInsulin() function
-// work on basalMenu() function
-// work on using a foreach loop over basal patterns
 
 public class Main {
     public static Pump pump;
@@ -26,7 +24,6 @@ public class Main {
         if(!configs.isEmpty()) {
             // create pump with configs
             pump = new Pump(configs);
-            //pump.printConfigs();
 
         } else {
             // create pump with new configs
@@ -43,7 +40,6 @@ public class Main {
         Thread thread2 = new Thread(updateThread);
         thread2.start();
      }
-
 
     // Followed this guide on reading files & storing to Hash Maps:
     // https://www.geeksforgeeks.org/reading-text-file-into-java-hashmap/

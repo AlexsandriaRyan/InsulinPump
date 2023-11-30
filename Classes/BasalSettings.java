@@ -92,7 +92,7 @@ public class BasalSettings {
         basalPatterns.add(temp);
 
         // check if this pattern should be the current basal pattern
-        if (pattern.endsWith("*")) {
+        if (pattern.endsWith("*") || currentBasalPattern == null) {
             currentBasalPattern = basalPatterns.size()-1;
         }
 
@@ -100,41 +100,105 @@ public class BasalSettings {
         Pump.writeConfigs();
     }
 
-    // ***** FUNCTIONS *********************************************
-    protected void deleteBasalPattern() {
-        System.out.println("Available Basal Patterns to delete:");
+    protected void setCurrentBasalPattern() {
+        System.out.println("Available Basal Patterns to select:");
 
-        for(int i = 0; i < basalPatterns.size(); i++) {
-            double dailyInsulin = 0;
-
-            for (double index : basalPatterns.get(i)) {
-                dailyInsulin += index;
-            }
-
-            System.out.println("Basal Pattern #" + (i+1) + " - Daily Insulin of " + dailyInsulin);
-        }
+        outputPatterns();
 
         Scanner scan = new Scanner(System.in);
         int input = scan.nextInt();
 
+        // if the basal pattern exists, confirm its selection
         if (basalPatterns.get(input-1) != null) {
-            System.out.println("Delete Basal Pattern #" + input + "?");
+            System.out.println("Select Basal Pattern #" + input + "?");
             System.out.println("1. Yes");
             System.out.println("2. No");
 
-            input = scan.nextInt();
+            int confirm = scan.nextInt();
 
-            if (input == 1) {
-                basalPatterns.remove(input-1);
-                System.out.println("Basal Pattern #" + input + " has been deleted.");
+            if (confirm == 1) {
+                currentBasalPattern = input-1;
+                System.out.println("Current Basal Pattern has been updated to Basal Pattern #" + input + "!");
 
+                // update configs
+                Pump.writeConfigs();
+
+            // if 'no' was selected
             } else {
                 System.out.println("Exiting Menu...");
             }
 
+        // if the selected basal pattern does not exist
         } else {
             System.out.println("Basal Pattern #" + input + " does not exist.");
             System.out.println("Exiting Menu...");
+        }
+    }
+
+    // ***** FUNCTIONS *********************************************
+    protected void deleteBasalPattern() {
+        System.out.println("Available Basal Patterns to delete:");
+
+        outputPatterns();
+
+        Scanner scan = new Scanner(System.in);
+        int input = scan.nextInt();
+
+        // if the basal pattern exists, confirm its deletion
+        if (basalPatterns.get(input-1) != null) {
+            if (input != currentBasalPattern+1) {
+                System.out.println("Delete Basal Pattern #" + input + "?");
+                System.out.println("1. Yes");
+                System.out.println("2. No");
+
+                int confirm = scan.nextInt();
+
+                if (confirm == 1) {
+                    // if deleting the basal pattern will affect the current basal pattern index, decrease the currentBasalPattern variable
+                    if (input < currentBasalPattern) {
+                        currentBasalPattern --;
+                    }
+
+                    basalPatterns.remove(input - 1);
+                    System.out.println("Basal Pattern #" + input + " has been deleted.");
+
+                    // update configs
+                    Pump.writeConfigs();
+
+                // if 'no' was selected
+                } else {
+                    System.out.println("Exiting Menu...");
+                }
+
+            // if the selected basal pattern is the current pattern
+            } else {
+                System.out.println("Cannot delete current basal pattern!");
+            }
+
+        // if the selected basal pattern does not exist
+        } else {
+            System.out.println("Basal Pattern #" + input + " does not exist.");
+            System.out.println("Exiting Menu...");
+        }
+    }
+
+    private void outputPatterns() {
+        for(int i = 0; i < basalPatterns.size(); i++) {
+            double dailyInsulin = 0;
+
+            // total up the insulin amount for the basal pattern @ 'i'
+            for (double index : basalPatterns.get(i)) {
+                dailyInsulin += index;
+            }
+
+            // add asterisk if the pattern is the current pattern
+            String current = "";
+            if (i == currentBasalPattern) {
+                current = "*";
+            }
+
+            // outputs the basal pattern # and the total amount of insulin per day
+            System.out.println("Basal Pattern #" + (i+1) + " - Daily Insulin of " + dailyInsulin + " " + current);
         }
     }
 }
