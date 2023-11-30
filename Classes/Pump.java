@@ -1,10 +1,14 @@
 package Classes;
 
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.*;
 import java.text.SimpleDateFormat;
 
 public class Pump {
-    static BolusSettings bolusSettings;
+    protected static BolusSettings bolusSettings;
     protected static BasalSettings basalSettings;
     private static Menu menus = null;
     private Date time;
@@ -19,24 +23,26 @@ public class Pump {
     private static final int ACTIVE_INSULIN_PER_HOUR = 60;
     private final SimpleDateFormat sdf = new SimpleDateFormat("E, dd MMMM, yyyy hh:mm a");
     private final String warning0String = "WARNING: Reservoir has 0 units of insulin remaining. Please change the reservoir immediately.";
+    public final static String configFilePath = "Configs/configs.txt";
 
     // ***** CONSTRUCTOR *********************************************
     public Pump() {
         System.out.println("***NEW INSULIN PUMP***");
         setTime();
-        newReservoir();
         System.out.println(sdf.format(time));
         bolusSettings = new BolusSettings();
         basalSettings = new BasalSettings();
+        writeConfigs();
+        newReservoir();
         menus = new Menu(this);
     }
 
     public Pump(HashMap<String, ArrayList<String>> configs) {
         System.out.println("***WELCOME BACK***");
         setTime();
-        newReservoir();
         bolusSettings = new BolusSettings(configs);
         basalSettings = new BasalSettings(configs);
+        newReservoir();
         menus = new Menu(this);
     }
 
@@ -146,7 +152,6 @@ public class Pump {
             if (command.equals("bolus")) {
                 System.out.printf("%.2f delivered.\n", insulinUsed);
             }
-
         }
     }
 
@@ -310,6 +315,81 @@ public class Pump {
             }
             // once navigation is complete, resume the updates
             update = true;
+        }
+    }
+
+    //https://stackoverflow.com/questions/26785315/how-to-overwrite-an-existing-txt-file
+    public static void writeConfigs() {
+        if (bolusSettings != null && basalSettings != null) {
+            try {
+                File file = new File(configFilePath);
+                FileWriter fw = new FileWriter(file.getAbsoluteFile());
+                BufferedWriter bw = new BufferedWriter(fw);
+
+                // config.txt's order is:
+                // CARB_RATIO
+                // INSULIN_SENSITIVITY
+                // INSULIN_LONGEVITY
+                // TARGET_GLUCOSE
+                // BASAL_PATTERN (1, 2, 3...)
+
+                // write carb ratios to file
+                bw.write("CARB_RATIO\n");
+                ArrayList<Double> writeCarbs = bolusSettings.getCarbRatio();
+                for (int i = 0; i < writeCarbs.size(); i++) {
+                    bw.write(String.valueOf(writeCarbs.get(i)) + "\n");
+                }
+                bw.write("\n");
+
+                // write insulin sensitivities to file
+                bw.write("INSULIN_SENSITIVITY\n");
+                ArrayList<Double> writeSensitivity = bolusSettings.getInsulinSensitivity();
+                for (int i = 0; i < writeSensitivity.size(); i++) {
+                    bw.write(writeSensitivity.get(i) + "\n");
+                }
+                bw.write("\n");
+
+                // write insulin longevity to file
+                bw.write("INSULIN_LONGEVITY\n");
+                int writeLongevity = bolusSettings.getInsulinLongevity();
+                bw.write(String.valueOf(writeLongevity) + "\n\n");
+
+                // write targets to file
+                bw.write("TARGET_GLUCOSE\n");
+                double[] writeTarget = bolusSettings.getTargetGlucose();
+                for (double target : writeTarget) {
+                    bw.write(target + "\n");
+                }
+                bw.write("\n");
+
+                // write basal patterns to file
+                // get current basal pattern #
+                int current = basalSettings.getCurrentBasalPattern();
+                for (int i = 0; i < basalSettings.getBasalPatternsSize(); i++) {
+                    bw.write("BASAL_PATTERN " + (i+1));
+
+                    // if this pattern is the current pattern, add an '*'
+                    if (i+1 == current) {
+                        bw.write(" *\n");
+
+                    } else {
+                        bw.write("\n");
+                    }
+
+                    // begin writing the pattern data
+                    ArrayList<Double> writeBasal = basalSettings.getBasalPatternIndex(i);
+                    for(double d : writeBasal) {
+                        bw.write(d + "\n");
+                    }
+
+                    bw.write("\n");
+                }
+
+                bw.close();
+
+            } catch(IOException e) {
+                e.printStackTrace();
+            }
         }
     }
 }

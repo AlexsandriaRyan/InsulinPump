@@ -11,7 +11,7 @@ public class UpdateThread implements Runnable {
     public void run() {
         // while the pump permits updates, print time, active insulin amount, and repeat every 1 minute
         while (Pump.update) {
-            System.out.println("------------------------------");
+            System.out.println("\n\n------------------------------");
             System.out.println(pump.getTime());
             System.out.println("ACTIVE INSULIN:\t" + pump.getActiveInsulin());
             System.out.printf("RESERVOIR:\t\t%.3f\n", pump.getReservoir());

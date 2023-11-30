@@ -5,7 +5,7 @@ import java.util.*;
 
 public class BasalSettings {
     ArrayList<ArrayList<Double>> basalPatterns = new ArrayList<>();
-    int currentBasalPattern;
+    Integer currentBasalPattern;
     //SimpleDateFormat sdf = new SimpleDateFormat("hh a");
 
     // ***** CONSTRUCTOR *********************************************
@@ -39,14 +39,8 @@ public class BasalSettings {
     }
 
     // ***** SETTERS *********************************************
-    private void setBasalPattern() {
-        // show available basal patterns (1, 2, 3... etc.)
-        // view a basal pattern
-        // delete a current basal pattern
-        // new basal pattern
-        // needs a way to change between patterns...?
-
-        System.out.println("\n***NEW BASAL PATTERN***");
+    protected void setBasalPattern() {
+        System.out.println("\n\n***NEW BASAL PATTERN***");
         System.out.println("Enter units of insulin per hour:");
         
         ArrayList<Double> temp = new ArrayList<>();
@@ -60,9 +54,30 @@ public class BasalSettings {
         
         basalPatterns.add(temp);
 
-        System.out.print("Basal Pattern saved!");
+        System.out.println("Basal Pattern saved!");
 
-        // write to configs
+        // if the current basal pattern is not set,
+        // ensure that it is set to this new pattern
+        // otherwise, ask the user if they would like to update
+        // their current basal pattern to this new pattern
+        if (currentBasalPattern == null) {
+            currentBasalPattern = basalPatterns.size()-1;
+
+        } else {
+            System.out.println("Save this pattern as the current basal pattern?");
+            System.out.println("1. Yes");
+            System.out.println("2. No");
+
+            char input = scan.next().charAt(0);
+
+            if (input == '1') {
+                currentBasalPattern = basalPatterns.size()-1;
+                System.out.print("Current Basal Pattern updated!");
+            }
+        }
+
+        // update config file
+        Pump.writeConfigs();
     }
 
     private void setBasalPattern(String pattern, ArrayList<String> configs) {
@@ -81,6 +96,45 @@ public class BasalSettings {
             currentBasalPattern = basalPatterns.size()-1;
         }
 
-        // write to configs
+        // update config file
+        Pump.writeConfigs();
+    }
+
+    // ***** FUNCTIONS *********************************************
+    protected void deleteBasalPattern() {
+        System.out.println("Available Basal Patterns to delete:");
+
+        for(int i = 0; i < basalPatterns.size(); i++) {
+            double dailyInsulin = 0;
+
+            for (double index : basalPatterns.get(i)) {
+                dailyInsulin += index;
+            }
+
+            System.out.println("Basal Pattern #" + (i+1) + " - Daily Insulin of " + dailyInsulin);
+        }
+
+        Scanner scan = new Scanner(System.in);
+        int input = scan.nextInt();
+
+        if (basalPatterns.get(input-1) != null) {
+            System.out.println("Delete Basal Pattern #" + input + "?");
+            System.out.println("1. Yes");
+            System.out.println("2. No");
+
+            input = scan.nextInt();
+
+            if (input == 1) {
+                basalPatterns.remove(input-1);
+                System.out.println("Basal Pattern #" + input + " has been deleted.");
+
+            } else {
+                System.out.println("Exiting Menu...");
+            }
+
+        } else {
+            System.out.println("Basal Pattern #" + input + " does not exist.");
+            System.out.println("Exiting Menu...");
+        }
     }
 }

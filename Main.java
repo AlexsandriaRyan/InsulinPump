@@ -17,7 +17,6 @@ import java.util.*;
 // work on using a foreach loop over basal patterns
 
 public class Main {
-    final static String configFilePath = "Configs/configs.txt";
     public static Pump pump;
 
     public static void main(String[] args) {
@@ -43,8 +42,6 @@ public class Main {
         UpdateThread updateThread = new UpdateThread(pump);
         Thread thread2 = new Thread(updateThread);
         thread2.start();
-
-        writeConfigs();
      }
 
 
@@ -58,7 +55,7 @@ public class Main {
 
         try {
             // create file object & Buffered Reader & temp String storage
-            File file = new File(configFilePath);
+            File file = new File(Pump.configFilePath);
             br = new BufferedReader(new FileReader(file));
             String line;
 
@@ -104,78 +101,5 @@ public class Main {
         }
 
         return tempMap;
-    }
-
-    //https://stackoverflow.com/questions/26785315/how-to-overwrite-an-existing-txt-file
-    public static void writeConfigs() {
-        try {
-            File file = new File(configFilePath);
-            FileWriter fw = new FileWriter(file.getAbsoluteFile());
-            BufferedWriter bw = new BufferedWriter(fw);
-
-            // config.txt's order is:
-            // CARB_RATIO
-            // INSULIN_SENSITIVITY
-            // INSULIN_LONGEVITY
-            // TARGET_GLUCOSE
-            // BASAL_PATTERN (1, 2, 3...)
-
-            // write carb ratios to file
-            bw.write("CARB_RATIO\n");
-            ArrayList<Double> writeCarbs = pump.getBolusSettings().getCarbRatio();
-            for (int i = 0; i < writeCarbs.size(); i++) {
-                bw.write(String.valueOf(writeCarbs.get(i)) + "\n");
-            }
-            bw.write("\n");
-
-            // write insulin sensitivities to file
-            bw.write("INSULIN_SENSITIVITY\n");
-            ArrayList<Double> writeSensitivity = pump.getBolusSettings().getInsulinSensitivity();
-            for (int i = 0; i < writeSensitivity.size(); i++) {
-                bw.write(writeSensitivity.get(i) + "\n");
-            }
-            bw.write("\n");
-
-            // write insulin longevity to file
-            bw.write("INSULIN_LONGEVITY\n");
-            int writeLongevity = pump.getBolusSettings().getInsulinLongevity();
-            bw.write(String.valueOf(writeLongevity) + "\n\n");
-
-            // write targets to file
-            bw.write("TARGET_GLUCOSE\n");
-            double[] writeTarget = pump.getBolusSettings().getTargetGlucose();
-            for (double target : writeTarget) {
-                bw.write(target + "\n");
-            }
-            bw.write("\n");
-
-            // write basal patterns to file
-            // get current basal pattern #
-            int current = pump.getBasalSettings().getCurrentBasalPattern();
-            for (int i = 0; i < pump.getBasalSettings().getBasalPatternsSize(); i++) {
-                bw.write("BASAL_PATTERN " + (i+1));
-
-                // if this pattern is the current pattern, add an '*'
-                if (i+1 == current) {
-                    bw.write(" *\n");
-
-                } else {
-                    bw.write("\n");
-                }
-
-                // begin writing the pattern data
-                ArrayList<Double> writeBasal = pump.getBasalSettings().getBasalPatternIndex(i);
-                for(double d : writeBasal) {
-                    bw.write(d + "\n");
-                }
-
-                bw.write("\n");
-            }
-
-            bw.close();
-
-        } catch(IOException e) {
-            e.printStackTrace();
-        }
     }
 }

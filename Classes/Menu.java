@@ -65,8 +65,6 @@ public class Menu {
                 System.out.println("Invalid entry. Exiting Menu...");
                 break;
         }
-
-
     }
 
     protected void bolusMenu() {
@@ -109,6 +107,35 @@ public class Menu {
 
     protected void basalMenu() {
         System.out.println("BASAL MENU:");
+        System.out.println("1. Add New Basal Pattern");
+        System.out.println("2. Delete Basal Pattern");
+        System.out.println("3. Select Current Basal Pattern");
+        System.out.println("Q to exit");
+
+        Scanner scan = new Scanner(System.in);
+        char input = scan.next().charAt(0);
+
+        switch (input) {
+            case '1':
+                Pump.basalSettings.setBasalPattern();
+                break;
+
+            case '2':
+                Pump.basalSettings.deleteBasalPattern();
+                break;
+
+            case '3':
+                Pump.bolusSettings.setInsulinLongevity();
+                break;
+
+            case 'Q' | 'q':
+                System.out.println("Exiting Menu...");
+                break;
+
+            default:
+                System.out.println("Invalid entry. Exiting Menu...");
+                break;
+        }
         // for each loop of basal patterns
         System.out.println("Q to exit");
     }

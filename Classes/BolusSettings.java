@@ -55,7 +55,7 @@ public class BolusSettings {
 
     // ***** SETTERS *********************************************
     protected void setCarbRatio() {
-        System.out.println("\n***CARB RATIO***");
+        System.out.println("\n\n***CARB RATIO***");
         System.out.println("Enter the grams of carbs per unit of insulin:");
 
         Scanner scan = new Scanner(System.in);
@@ -65,9 +65,10 @@ public class BolusSettings {
             carbRatio.add(temp);
         }
 
-        System.out.print("Carb Ratio saved!");
+        System.out.println("Carb Ratio saved!");
 
-        // write to configs
+        // update config file
+        Pump.writeConfigs();
     }
 
     private void setCarbRatio(ArrayList<String> configs) {
@@ -77,11 +78,12 @@ public class BolusSettings {
             carbRatio.add(ratio);
         }
 
-        // write to configs
+        // update config file
+        Pump.writeConfigs();
     }
 
     protected void setInsulinSensitivity() {
-        System.out.println("\n***INSULIN SENSITIVITY***");
+        System.out.println("\n\n***INSULIN SENSITIVITY***");
         System.out.println("Enter the insulin sensitivity: ");
 
         Scanner scan = new Scanner(System.in);
@@ -91,9 +93,10 @@ public class BolusSettings {
             insulinSensitivity.add(temp);
         }
 
-        System.out.print("Insulin Sensitivity saved!");
+        System.out.println("Insulin Sensitivity saved!");
 
-        // write to configs
+        // update config file
+        Pump.writeConfigs();
     }
 
     private void setInsulinSensitivity(ArrayList<String> configs) {
@@ -103,19 +106,21 @@ public class BolusSettings {
             insulinSensitivity.add(ratio);
         }
 
-        // write to configs
+        // update config file
+        Pump.writeConfigs();
     }
 
     protected void setInsulinLongevity() {
-        System.out.println("\n***INSULIN LONGEVITY***");
+        System.out.println("\n\n***INSULIN LONGEVITY***");
         System.out.print("Enter the insulin longevity: ");
 
         Scanner scan = new Scanner(System.in);
         insulinLongevity = scan.nextInt();
 
-        System.out.print("Insulin Longevity saved!");
+        System.out.println("Insulin Longevity saved!");
 
-        // write to configs
+        // update config file
+        Pump.writeConfigs();
     }
 
     private void setInsulinLongevity(ArrayList<String> configs) {
@@ -124,11 +129,12 @@ public class BolusSettings {
             insulinLongevity = Integer.parseInt(str);
         }
 
-        // write to configs
+        // update config file
+        Pump.writeConfigs();
     }
 
     protected void setTargetGlucose() {
-        System.out.println("\n***TARGET GLUCOSE***");
+        System.out.println("\n\n***TARGET GLUCOSE***");
         Scanner scan = new Scanner(System.in);
 
         System.out.print("Enter the lowest target: ");
@@ -147,9 +153,10 @@ public class BolusSettings {
 
         targetGlucose = new double[]{low, high};
 
-        System.out.print("Target Glucose saved!");
+        System.out.println("Target Glucose saved!\n");
 
-        // write to configs
+        // update config file
+        Pump.writeConfigs();
     }
 
     private void setTargetGlucose(ArrayList<String> configs) {
@@ -174,6 +181,7 @@ public class BolusSettings {
 
         targetGlucose = new double[]{ low, high };
 
-        // write to configs
+        // update config file
+        Pump.writeConfigs();
     }
 }
