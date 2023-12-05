@@ -2,6 +2,7 @@
 // INFT 3000 - Capstone
 // NSCC Fall 2023
 
+import Classes.ActiveInsulinThread;
 import Classes.BasalThread;
 import Classes.Pump;
 import Classes.UpdateThread;
@@ -11,8 +12,6 @@ import java.util.*;
 
 // TO DO / CONSIDER / Notes
 // implement timeout feature for capturing chars
-// work on correct() function
-// work on reduceActiveInsulin() function
 
 public class Main {
     public static Pump pump;
@@ -39,6 +38,12 @@ public class Main {
         UpdateThread updateThread = new UpdateThread(pump);
         Thread thread2 = new Thread(updateThread);
         thread2.start();
+
+        // begin activeInsulin tasks
+        ActiveInsulinThread activeInsulinThread = new ActiveInsulinThread(pump);
+        Thread thread3 = new Thread(activeInsulinThread);
+        thread3.start();
+
      }
 
     // Followed this guide on reading files & storing to Hash Maps:
@@ -79,7 +84,6 @@ public class Main {
             }
 
         } catch (Exception e) {
-            // replace with better exception?
             e.printStackTrace();
 
         } finally {
@@ -90,7 +94,6 @@ public class Main {
                     br.close();
 
                 } catch (Exception e) {
-                    // replace with better exception?
                     e.printStackTrace();
                 }
             }

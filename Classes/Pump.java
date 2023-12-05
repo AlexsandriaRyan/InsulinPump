@@ -14,13 +14,14 @@ public class Pump {
     private Date time;
     public static boolean active = true;
     public static boolean update = true;
+    public static boolean on = true;
     private boolean warning10 = false;
     private boolean warning20 = false;
     private boolean warning0 = false;
     private double reservoir;
     private ArrayList<Double> activeInsulin = new ArrayList<>();
     private static final int BASAL_PER_HOUR = 60;
-    private static final int ACTIVE_INSULIN_PER_HOUR = 60;
+    protected static final int ACTIVE_INSULIN_PER_HOUR = 60;
     private final SimpleDateFormat sdf = new SimpleDateFormat("E, dd MMMM, yyyy hh:mm a");
     private final String warning0String = "WARNING: Reservoir has 0 units of insulin remaining. Please change the reservoir immediately.";
     public final static String configFilePath = "Configs/configs.txt";
@@ -150,7 +151,7 @@ public class Pump {
 
             // print out confirmation of delivery if the setReservoir() request came from a bolus
             if (command.equals("bolus")) {
-                System.out.printf("%.2f delivered.\n", insulinUsed);
+                System.out.printf("%.2f units delivered.\n", insulinUsed);
             }
         }
     }
@@ -166,17 +167,19 @@ public class Pump {
 
         // add the divided bolus amount to the activeInsulin ArrayList
         for(int i = 0; i < ACTIVE_INSULIN_PER_HOUR * bolusSettings.getInsulinLongevity(); i++) {
-            activeInsulin.add(bolusDivided);
+            // if there is already active insulin set for this timeframe,
+            // add the current & new bolused amounts
+            if (i < activeInsulin.size()) {
+                double newActive = activeInsulin.get(i) + bolusDivided;
+                activeInsulin.set(i, newActive);
+
+            } else {
+                activeInsulin.add(bolusDivided);
+            }
         }
     }
 
     // ***** FUNCTIONS *********************************************
-    private void saveConfigs() {
-        // create a function that will save configs based on the pump's
-        // bolus / basal settings. This should be run every time that
-        // the settings are updated.
-    }
-
     public void printConfigs() {
         System.out.println("PUMP CONFIGS: ");
         System.out.println("CURRENT TIME: " + time);
@@ -206,6 +209,7 @@ public class Pump {
         // capture carbohydrates
         System.out.print("Carbs: ");
         double carbs = scan.nextDouble();
+        carbs = carbs / bolusSettings.getCarbRatio(getHour());
 
         // capture manual bolus
         System.out.print("Manual Bolus: ");
@@ -214,16 +218,22 @@ public class Pump {
         // add correction, carbs, and manual bolus to calculate total bolus amount
         double bolus = correction + carbs + manual;
 
-        System.out.printf("Total: %.2f units\n", bolus);
-        System.out.println("OK?");
-        System.out.println("1. Yes");
-        System.out.println("2. No");
+        if (bolus <= 0) {
+            System.out.println("WARNING: Low blood sugar. Consume fast-acting glucose to increase blood sugar.");
 
-        // if user accepts bolus, set the reservoir to the new amount, calculate active insulin, and print confirmation of bolus
-        char input = scan.next().charAt(0);
-        if (input == '1') {
-            setReservoir(bolus, "bolus");
-            setActiveInsulin(bolus);
+        } else {
+            System.out.printf("Correction:\t%.2f units\nCarbs:\t\t%.2f units\nManual:\t\t%.2f units\n", correction, carbs, manual);
+            System.out.printf("Total:\t\t%.2f units\n", bolus);
+            System.out.println("OK?");
+            System.out.println("1. Yes");
+            System.out.println("2. No");
+
+            // if user accepts bolus, set the reservoir to the new amount, calculate active insulin, and print confirmation of bolus
+            char input = scan.next().charAt(0);
+            if (input == '1') {
+                setReservoir(bolus, "bolus");
+                setActiveInsulin(bolus);
+            }
         }
     }
 
@@ -232,7 +242,7 @@ public class Pump {
         setReservoir(basalSettings.getBasalPattern(getHour()) / BASAL_PER_HOUR, "basal");
     }
 
-    private void reduceActiveInsulin() {
+    protected void reduceActiveInsulin() {
         if (!activeInsulin.isEmpty()) {
             activeInsulin.remove(0);
         }
@@ -275,11 +285,15 @@ public class Pump {
         // calculate insulin needed to meet glucose targets
         if (bg < bolusSettings.getLowTarget()) {
             // calculate less insulin
-            return -1; // TEMP
+            double difference = bolusSettings.getLowTarget() - bg;
+
+            return difference / (bolusSettings.getInsulinSensitivity(getHour()) * -1);
 
         } else if (bg > bolusSettings.getHighTarget()) {
             // calculate more insulin
-            return 1; // TEMP
+            double difference = bg - bolusSettings.getHighTarget();
+
+            return difference / bolusSettings.getInsulinSensitivity(getHour());
 
         } else {
             // no adjustment needed
@@ -291,7 +305,7 @@ public class Pump {
         // check for input (bolus or menu)
         char input = '0';
         while (input == '0') {
-            Scanner scan = new Scanner(System.in);
+            Scanner scan = new Scanner(System.in); // UPDATE THIS TO BUFFERED READER TO PREVENT THREADING ISSUES
             input = scan.next().charAt(0);
 
             if (input == '1' || input == '2') {
@@ -326,7 +340,7 @@ public class Pump {
                 FileWriter fw = new FileWriter(file.getAbsoluteFile());
                 BufferedWriter bw = new BufferedWriter(fw);
 
-                // config.txt's order is:
+                // config.txt order is:
                 // CARB_RATIO
                 // INSULIN_SENSITIVITY
                 // INSULIN_LONGEVITY

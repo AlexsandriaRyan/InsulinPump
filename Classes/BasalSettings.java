@@ -6,7 +6,6 @@ import java.util.*;
 public class BasalSettings {
     ArrayList<ArrayList<Double>> basalPatterns = new ArrayList<>();
     Integer currentBasalPattern;
-    //SimpleDateFormat sdf = new SimpleDateFormat("hh a");
 
     // ***** CONSTRUCTOR *********************************************
     protected BasalSettings() {
