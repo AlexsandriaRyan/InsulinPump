@@ -10,7 +10,7 @@ import Classes.UpdateThread;
 import java.io.*;
 import java.util.*;
 
-// TO DO / CONSIDER / Notes
+// TO DO
 // implement timeout feature for capturing chars
 
 public class Main {
@@ -29,6 +29,8 @@ public class Main {
             pump = new Pump();
         }
 
+        //pump.bolus();
+
         // begin basal tasks
         BasalThread basalThread = new BasalThread(pump);
         Thread thread1 = new Thread(basalThread);
@@ -43,7 +45,6 @@ public class Main {
         ActiveInsulinThread activeInsulinThread = new ActiveInsulinThread(pump);
         Thread thread3 = new Thread(activeInsulinThread);
         thread3.start();
-
      }
 
     // Followed this guide on reading files & storing to Hash Maps:

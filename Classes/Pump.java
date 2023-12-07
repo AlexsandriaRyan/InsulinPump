@@ -73,12 +73,6 @@ public class Pump {
         return sum;
     }
 
-    public BasalSettings getBasalSettings() {
-        return basalSettings;
-    }
-
-    public BolusSettings getBolusSettings() { return bolusSettings; }
-
     // ***** SETTERS *********************************************
     private void setTime() {
         time = new Date();
@@ -180,6 +174,7 @@ public class Pump {
     }
 
     // ***** FUNCTIONS *********************************************
+    // for testing
     public void printConfigs() {
         System.out.println("PUMP CONFIGS: ");
         System.out.println("CURRENT TIME: " + time);
@@ -322,8 +317,6 @@ public class Pump {
                     }
 
                 } else {
-                    // TO DO HERE:
-                    // Implement a timeout feature (bookmarked on chrome)
                     menus.mainMenu();
                 }
             }

@@ -7,7 +7,6 @@ public class BolusSettings {
     private final ArrayList<Double> insulinSensitivity = new ArrayList<>();
     private int insulinLongevity;
     private double[] targetGlucose;
-    //SimpleDateFormat sdf = new SimpleDateFormat("hh a");
 
     // ***** CONSTRUCTOR *********************************************
     BolusSettings() {
@@ -55,6 +54,9 @@ public class BolusSettings {
 
     // ***** SETTERS *********************************************
     protected void setCarbRatio() {
+        // reset the carb ratio arraylist
+        carbRatio.clear();
+
         System.out.println("\n\n***CARB RATIO***");
         System.out.println("Enter the grams of carbs per unit of insulin:");
 
@@ -83,6 +85,9 @@ public class BolusSettings {
     }
 
     protected void setInsulinSensitivity() {
+        // reset the insulin sensitivity arraylist
+        insulinSensitivity.clear();
+
         System.out.println("\n\n***INSULIN SENSITIVITY***");
         System.out.println("Enter the insulin sensitivity: ");
 
