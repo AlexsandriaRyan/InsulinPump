@@ -20,7 +20,7 @@ public class UpdateThread implements Runnable {
             System.out.println("OPTIONS:\t\t1.Bolus 2.Menu");
 
             // uncomment this when trying to test the menus
-            // pump.checkForMenu();git
+            // pump.checkForMenu();
 
             try {
                 Thread.sleep(TEN_SECONDS);

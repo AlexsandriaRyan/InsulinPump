@@ -29,7 +29,7 @@ public class Main {
             pump = new Pump();
         }
 
-        // uncomment this when trying to test the "update thread"
+        // uncomment this when trying to test the threads
         // pump.bolus
 
         // begin basal tasks
