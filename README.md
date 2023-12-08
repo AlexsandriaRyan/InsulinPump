@@ -10,7 +10,7 @@ Simulated insulin pump program for Capstone project, winter 2023.
 There is a presentation included in this repository that details more about this project. Please view **Insulin Pump Simulation.pdf**
 
 ## Video
-There is a video that walks through how this project works. [Click Here](https://www.youtube.com/watch?v=E-tawDlWJ8A&ab_channel=AlexRyan)
+There is a video that walks through how this project works. [Click Here](https://www.youtube.com/watch?v=6CxtY4bNHWY&ab_channel=AlexRyan)
 
 ## Copyright Notice
 © 2023 Alexsandria Ryan All rights reserved.
