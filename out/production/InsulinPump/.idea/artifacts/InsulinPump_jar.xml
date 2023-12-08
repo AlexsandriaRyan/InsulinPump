@@ -1,0 +1,8 @@
+<component name="ArtifactManager">
+  <artifact type="jar" name="InsulinPump:jar">
+    <output-path>$PROJECT_DIR$/out/artifacts/InsulinPump_jar</output-path>
+    <root id="archive" name="InsulinPump.jar">
+      <element id="module-output" name="InsulinPump" />
+    </root>
+  </artifact>
+</component>

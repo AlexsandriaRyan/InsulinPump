@@ -29,7 +29,8 @@ public class Main {
             pump = new Pump();
         }
 
-        //pump.bolus();
+        // uncomment this when trying to test the "update thread"
+        // pump.bolus
 
         // begin basal tasks
         BasalThread basalThread = new BasalThread(pump);

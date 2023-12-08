@@ -19,7 +19,8 @@ public class UpdateThread implements Runnable {
             System.out.printf("RESERVOIR:\t\t%.2f\n", pump.getReservoir());
             System.out.println("OPTIONS:\t\t1.Bolus 2.Menu");
 
-            pump.checkForMenu();
+            // uncomment this when trying to test the menus
+            // pump.checkForMenu();git
 
             try {
                 Thread.sleep(TEN_SECONDS);
